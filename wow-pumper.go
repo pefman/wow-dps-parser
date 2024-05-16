@@ -68,7 +68,7 @@ func LoadConfig(filename string) (*Config, error) {
 func main() {
     config, err := LoadConfig("config.conf")
     if err != nil {
-        fmt.Println("Could not load config: %v", err)
+        fmt.Println("Could not load config:", err)
     }
 	
 	// Open the file.
