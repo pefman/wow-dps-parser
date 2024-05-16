@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,18 +12,67 @@ import (
 	"golang.org/x/text/number"
 )
 
-var logfile string
-var player string
 var totaldamage int
 
+type Config struct {
+    player string
+    zone   string
+	logfile	   string
+}
+
+func LoadConfig(filename string) (*Config, error) {
+    // Open the config file
+    file, err := os.Open(filename)
+    if err != nil {
+        return nil, fmt.Errorf("failed to open config file: %v", err)
+    }
+    defer file.Close()
+
+    config := &Config{}
+    scanner := bufio.NewScanner(file)
+
+    for scanner.Scan() {
+        line := scanner.Text()
+        if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
+            // Skip empty lines and comments
+            continue
+        }
+
+        parts := strings.SplitN(line, "=", 2)
+        if len(parts) != 2 {
+            return nil, fmt.Errorf("invalid config line: %s", line)
+        }
+
+        key := strings.TrimSpace(parts[0])
+        value := strings.TrimSpace(parts[1])
+
+        switch key {
+        case "player":
+            config.player = value
+        case "zone":
+            config.zone = value
+		case "logfile":
+            config.logfile = value
+        default:
+            return nil, fmt.Errorf("unknown config key: %s", key)
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        return nil, fmt.Errorf("error reading config file: %v", err)
+    }
+
+    return config, nil
+}
+
 func main() {
-
-	flag.StringVar(&logfile, "logfile", "default", "usage: --logfile '<logfile>'")
-	flag.StringVar(&player, "player", "default", "<character name>")
-	flag.Parse()
-
+    config, err := LoadConfig("config.conf")
+    if err != nil {
+        fmt.Println("Could not load config: %v", err)
+    }
+	
 	// Open the file.
-	file, err := os.Open(logfile)
+	file, err := os.Open(config.logfile)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -42,7 +90,7 @@ func main() {
 		lineCount++
 		line := scanner.Text()
 
-		if strings.Contains(line, "SPELL_DAMAGE") && strings.Contains(line, player) || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Ebon Might") {
+		if strings.Contains(line, "SPELL_DAMAGE") && strings.Contains(line, config.player) || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Ebon Might") {
 			fields := strings.Split(line, ",")
 			//ability := string([]rune(fields[10])[1 : len([]rune(fields[10]))-1])
 			//fmt.Println(fields[0], ability, fields[30])
@@ -62,5 +110,5 @@ func main() {
 	}
 	fmt.Printf("lines processed: %d \n", lineCount)
 	p := message.NewPrinter(language.English)
-	p.Printf("total damage: %v", number.Decimal(totaldamage))
+	p.Printf("total damage: %v \n", number.Decimal(totaldamage))
 }
