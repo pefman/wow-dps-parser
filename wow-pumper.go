@@ -15,62 +15,62 @@ import (
 var totaldamage int
 
 type Config struct {
-    player string
-    zone   string
-	logfile	   string
+	player  string
+	zone    string
+	logfile string
 }
 
 func LoadConfig(filename string) (*Config, error) {
-    // Open the config file
-    file, err := os.Open(filename)
-    if err != nil {
-        return nil, fmt.Errorf("failed to open config file: %v", err)
-    }
-    defer file.Close()
+	// Open the config file
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open config file: %v", err)
+	}
+	defer file.Close()
 
-    config := &Config{}
-    scanner := bufio.NewScanner(file)
+	config := &Config{}
+	scanner := bufio.NewScanner(file)
 
-    for scanner.Scan() {
-        line := scanner.Text()
-        if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
-            // Skip empty lines and comments
-            continue
-        }
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
+			// Skip empty lines and comments
+			continue
+		}
 
-        parts := strings.SplitN(line, "=", 2)
-        if len(parts) != 2 {
-            return nil, fmt.Errorf("invalid config line: %s", line)
-        }
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid config line: %s", line)
+		}
 
-        key := strings.TrimSpace(parts[0])
-        value := strings.TrimSpace(parts[1])
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
 
-        switch key {
-        case "player":
-            config.player = value
-        case "zone":
-            config.zone = value
+		switch key {
+		case "player":
+			config.player = value
+		case "zone":
+			config.zone = value
 		case "logfile":
-            config.logfile = value
-        default:
-            return nil, fmt.Errorf("unknown config key: %s", key)
-        }
-    }
+			config.logfile = value
+		default:
+			return nil, fmt.Errorf("unknown config key: %s", key)
+		}
+	}
 
-    if err := scanner.Err(); err != nil {
-        return nil, fmt.Errorf("error reading config file: %v", err)
-    }
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error reading config file: %v", err)
+	}
 
-    return config, nil
+	return config, nil
 }
 
 func main() {
-    config, err := LoadConfig("config.conf")
-    if err != nil {
-        fmt.Println("Could not load config:", err)
-    }
-	
+	config, err := LoadConfig("config.conf")
+	if err != nil {
+		fmt.Println("Could not load config:", err)
+	}
+
 	// Open the file.
 	file, err := os.Open(config.logfile)
 	if err != nil {
@@ -90,10 +90,13 @@ func main() {
 		lineCount++
 		line := scanner.Text()
 
-		if strings.Contains(line, "SPELL_DAMAGE") && strings.Contains(line, config.player) || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") || strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Ebon Might") {
+		if strings.Contains(line, "SPELL_DAMAGE") && strings.Contains(line, config.player) ||
+			strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") ||
+			strings.Contains(line, "SPELL_PERIODIC_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") ||
+			strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Ebon Might") {
 			fields := strings.Split(line, ",")
-			//ability := string([]rune(fields[10])[1 : len([]rune(fields[10]))-1])
-			//fmt.Println(fields[0], ability, fields[30])
+			ability := string([]rune(fields[10])[1 : len([]rune(fields[10]))-1])
+			fmt.Println(fields[0], ability, fields[30])
 
 			damage, err := strconv.Atoi(fields[30])
 			if err != nil {
