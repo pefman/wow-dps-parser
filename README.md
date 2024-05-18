@@ -20,7 +20,14 @@ This example is a augmentation evoker doing damage with buffs like ** Prescience
 ```
 ## Included example
 the combat log that is included for testing is from the first boss in a heroic version of Neltharus
+
+details
+
 ![World Of Warcraft Screenshot 2024 05 18 - 22 22 37 21-sdr](https://github.com/pefman/wow-dps-parser/assets/5830988/208bec5a-bb76-4eed-858f-4bee78d5db53)
+
+warcraftlogs
+
+![image](https://github.com/pefman/wow-dps-parser/assets/5830988/90f1c4df-2388-4aa7-9cf0-6740113da09c)
 
 
 
