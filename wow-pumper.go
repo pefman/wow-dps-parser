@@ -95,8 +95,8 @@ func main() {
 			strings.Contains(line, "SPELL_PERIODIC_DAMAGE_SUPPORT") && strings.Contains(line, "Prescience") ||
 			strings.Contains(line, "SPELL_DAMAGE_SUPPORT") && strings.Contains(line, "Ebon Might") {
 			fields := strings.Split(line, ",")
-			ability := string([]rune(fields[10])[1 : len([]rune(fields[10]))-1])
-			fmt.Println(fields[0], ability, fields[30])
+			//ability := string([]rune(fields[10])[1 : len([]rune(fields[10]))-1])
+			//fmt.Println(fields[0], ability, fields[30])
 
 			damage, err := strconv.Atoi(fields[30])
 			if err != nil {
